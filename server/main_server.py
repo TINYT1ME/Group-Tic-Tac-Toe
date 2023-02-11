@@ -4,6 +4,7 @@ import json
 import time
 import select
 import threading
+from random import randint
 
 # Server info
 HEADER = 1024
@@ -22,19 +23,32 @@ game_board = [
     ["","",""]
 ]
 
+# All connected players
 all_players = []
 
-voting = []
+# Dictionary that holds position and # of times that pos was entered
+voting = {}
 
-def check_valid(inp: str):
+# Update board
+def update_board(team):
+    global game_board
+
+    # If dictionary empty
+    if not voting:
+        game_board[randint(0, 2)][randint(0, 2)] = f"{team}"
+    else:
+        points = max(voting, key=voting.get)
+        game_board[points[1]][points[0]] = f"{team}"
+
+def check_valid(x_value, y_value):
     if (
         (
-            int(inp[0]) >= 0 and
-            int(inp[0]) <= 2
+            int(x_value) >= 0 and
+            int(x_value) <= 2
         ) and
         (
-            int(inp[2]) >= 0 and
-            int(inp[2]) <= 2
+            int(y_value) >= 0 and
+            int(y_value) <= 2
         )
     ):
         return True
@@ -51,17 +65,24 @@ def handle_connection(conn):
         data = json.loads(data.decode())
         x_value = data.get("x")
         y_value = data.get("y")
-        pos = [x_value, y_value]
-        for vote in voting:
-            if vote[0] == pos:
-                vote[1] += 1
+        if not check_valid(x_value, y_value):
+            x_value = None
+            data_out = json.dumps({"msg": f"Invalid move plz choose again: ", "prompt": True})
+            conn.send(data_out.encode())
+        else:
+            pos = [x_value, y_value]
+
+            # Adding to voting dictionary
+            if (x_value, y_value) in voting:
+                voting[(x_value, y_value)] += 1
             else:
-                voting.append([pos, 1])
-        print(voting)
-        print(f"\n[CLIENT DATA] {conn} entered: x={x_value}, y={y_value}\n")
+                voting[(x_value, y_value)] = 1
+            print(voting)
+            print(f"\n[CLIENT DATA] {conn} entered: x={x_value}, y={y_value}\n")
     
 # Server start function
 def start():
+    global voting
     # TEAM 0 IS X, TEAM 1 is O
     team = 0
 
@@ -113,9 +134,17 @@ def start():
         while time.time() < t_end:
             pass
 
-        print(voting)
+
+        # Update board with most voted position
+        update_board(team)
+
+        # Send board to all clients
+        for player in all_players:
+            data_out = json.dumps({"board": game_board, "msg": f"Team{team} placed piece"})
+            player[0].send(data_out.encode())
 
         print("\n[SWITCHING]\n")
+        voting = {}
 
         team = (team + 1) % 2   # Alternates 0 and 1
 
