@@ -1,8 +1,9 @@
 import socket
 import json
+import sys
 
 # Connection information
-HEADER = 64
+HEADER = 1024
 PORT = 5050
 FORMAT = 'utf-8'
 SERVER = input("Please enter server ip address: ")
@@ -19,7 +20,26 @@ def send(msg):
     client.send(send_length)
     client.send(message)
 
+data_in = client.recv(HEADER)
+data_in = json.loads(data_in.decode())
+team = data_in.get("team")
+print(f"You are on team {team}")
+
 while True:
-    msg_recv = client.recv(2048).decode(FORMAT)
-    print(msg_recv)
-    
+    try:
+        data_in = client.recv(HEADER)
+        data_in = json.loads(data_in.decode())
+        if data_in.get("prompt"):
+            x_value = int(input("x value on board: "))
+            y_value = int(input("y value on board: "))
+            if x_value == -1 or y_value == -1:
+                break                
+            data_out = json.dumps({"x": x_value, "y": y_value})
+            client.send(data_out.encode())
+            print("Sent\n")
+    except Exception as e:
+        if hasattr(e, "KeyboardInterrupt"):
+            print("Exiting")
+            sys.exit()
+        else:
+            print(e)
