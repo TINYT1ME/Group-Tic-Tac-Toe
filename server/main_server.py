@@ -1,6 +1,7 @@
 # Libraries
 import socket 
 import threading
+import json
 
 # Server info
 HEADER = 64
@@ -18,6 +19,22 @@ game_board = [
     ["","",""],
     ["","",""]
 ]
+game_status = 0
+
+def check_valid(inp: str):
+    if (
+        (
+            int(inp[0]) >= 0 and
+            int(inp[0]) <= 2
+        ) and
+        (
+            int(inp[2]) >= 0 and
+            int(inp[2]) <= 2
+        )
+    ):
+        return True
+    else:
+        return False
 
 # Client handling, new thread per client
 def handle_client(conn, addr, team: int):
@@ -25,13 +42,17 @@ def handle_client(conn, addr, team: int):
 
     # Sending team to user
     conn.send((f"You are on team {team}").encode())
+    conn.send(team)
 
     connected = True
+    local_game_status = game_status
     while connected:
         msg_length = conn.recv(HEADER).decode(FORMAT)
         if msg_length:
             msg_length = int(msg_length)
             msg = conn.recv(msg_length).decode(FORMAT)
+
+
 
             # Checking if user wants to disconnect
             if msg == "q":

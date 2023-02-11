@@ -1,10 +1,11 @@
 import socket
+import json
 
 # Connection information
 HEADER = 64
 PORT = 5050
 FORMAT = 'utf-8'
-SERVER = input("Please enter server ip address")
+SERVER = input("Please enter server ip address: ")
 ADDR = (SERVER, PORT)
 
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
