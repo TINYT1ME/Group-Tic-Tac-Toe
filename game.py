@@ -5,18 +5,18 @@ class Game:
         self.teams = ('white', 'black')
         self.moves = [None, None]
         self.game_over = False
-        self.notation = {"a": 0, "b": 1, "c": 2,
-                         "d": 3, "e": 4, "f": 5, "g": 6, "f": 7}
+        self.notation = {"a": 7, "b": 6, "c": 5,
+                         "d": 4, "e": 3, "f": 2, "g": 1, "f": 0}
         # uppercase = white, lowercase = black
         self.board = [
-            ['p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'],
-            ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'],
-            [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
-            [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
-            [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
-            [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
             ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R'],
             ['P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'],
+            [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+            [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+            [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+            [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+            ['p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'],
+            ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'],
         ]
 
     def get_board(self):
@@ -59,32 +59,41 @@ class Game:
         end_row, end_col = end[0], end[1]
         board = self.board
 
-        print(start, end)
         # Checks if there is a chess piece
         piece = board[start_row][start_col]
 
         if piece == ' ':
-            print("There is no piece at " + start + ".")
+            print("There is no piece at " + str(start) + ".")
             return False
 
-        if (piece.isupper() and end_row > start_row) or (piece.islower() and end_row < start_row):
-            return False
+        # I forgot what this is for...
+        # if (piece.isupper() and end_row > start_row) or (piece.islower() and end_row < start_row):
+        #     print(-1)
+        #     return False
 
         # Check that the player is moving their own piece
         piece = board[start[0]][start[1]]
-        if current_team == 'white' and piece.isupper() or current_team == 'black' and piece.islower():
+        if current_team == 'white' and piece.islower() or current_team == 'black' and piece.isupper():
+            print(0)
             return False
 
         # Pawn
         if piece.upper() == 'P':
+            # Forward moves
             if start_col == end_col and board[end_row][end_col] != ' ':
+                print(1)
                 return False
             if start_col != end_col and board[end_row][end_col] == ' ':
+                print(2)
                 return False
-            if abs(end_col - start_col) > 1:
-                return False
-            if abs(end_row - start_row) == 1 and board[end_row][end_col] == ' ':
-                return False
+
+            # En passant
+            # if abs(end_col - start_col) > 1:
+            #     print(3)
+            #     return False
+            # if abs(end_row - start_row) == 1 and board[end_row][end_col] == ' ':
+            #     print(4)
+            #     return False
 
         # Rook
         if piece.upper() == 'R':
@@ -196,8 +205,8 @@ class Game:
     # start, end - each represents a (row, column) tuple (i.e. (1,0) = 'a2')
     def move_piece(self, board, current_team, start, end):
         # Converts the input to row and colum indices
-        start_row, start_col = 8 - int(start[1]), ord(start[0]) - ord('a')
-        end_row, end_col = 8 - int(end[1]), ord(end[0]) - ord('a')
+        start_row, start_col = start[0], start[1]
+        end_row, end_col = end[0], end[1]
 
         # Moves the piece if it's valid
         piece = board[start_row][start_col]
