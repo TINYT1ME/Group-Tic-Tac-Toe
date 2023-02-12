@@ -4,6 +4,8 @@ import pygame
 # Initialize the game over flag
 game_over = False
 
+clock = pygame.time.Clock()
+current_time = 15
 
 def get_click():
     pygame.init()
@@ -40,7 +42,7 @@ def draw_window(board, font, small_font, WIN, black, white, team, counter):
     WIN.blit(text, (0, 0))
 
     # Show counter
-    counter = small_font.render(str(counter), True, black)
+    counter = small_font.render(str(int(counter / 60)), True, black)
     WIN.blit(counter, (240, 0))
 
     # Draw board lines
@@ -73,9 +75,18 @@ def main(board, team, countdown):
     font = pygame.font.Font(None, 72)
     small_font = pygame.font.Font(None, 24)
 
+    fps = 60
+    start_time = 10 * fps
+    current_time = start_time
+
     # Main game loop
     while not game_over:
-        draw_window(board, font, small_font, WIN, black, white, team, countdown)
+        draw_window(board, font, small_font, WIN, black, white, team, current_time)
+
+        current_time -= 1
+        if current_time <=0:
+            current_time = start_time
+        clock.tick(fps)
 
 
 # Quit pygame

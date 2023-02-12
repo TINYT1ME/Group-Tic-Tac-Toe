@@ -17,6 +17,8 @@ FORMAT = "utf-8"
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.bind(ADDR)
 
+print(socket.gethostname())
+
 # Game Board
 game_board = [["", "", ""], ["", "", ""], ["", "", ""]]
 
@@ -131,7 +133,7 @@ def start():
     print(f"[LISTENING] Server is listening on {SERVER}\n")
 
     # Give 60 seconds at beginning for clients to connect
-    t_end = time.time() + 10
+    t_end = time.time() + 60
     print("[CONNECTIONS] Beginning connections (60 sec)")
 
     timer = threading.Thread(target=countdown, args=(59,))

@@ -65,12 +65,11 @@ while True:
 
         # If winner
         if data_in.get("winner"):
-            x_value = int(
-                simpledialog.askstring(
+            temp = simpledialog.askstring(
                     "", f"Winner is: {data_in.get('winner')}", parent=root
                 )
-            )
-            break
+            pygame.quit()
+            sys.exit()
         # User prompted to vote piece
         if data_in.get("prompt"):
             x_value = int(
