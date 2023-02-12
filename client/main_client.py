@@ -1,6 +1,8 @@
 import socket
 import json
 import sys
+from game import main
+import threading
 
 # Connection information
 HEADER = 1024
@@ -11,6 +13,12 @@ ADDR = (SERVER, PORT)
 
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client.connect(ADDR)
+
+board = [
+    ["","",""],
+    ["","",""],
+    ["","",""]
+]
 
 def send(msg):
     message = msg.encode(FORMAT)
@@ -25,6 +33,11 @@ data_in = json.loads(data_in.decode())
 team = data_in.get("team")
 print(f"You are on team {team}")
 
+# Create pygame thread
+game_thread = threading.Thread(target=main, args=(board, team))
+game_thread.start()
+
+
 while True:
     try:
         data_in = client.recv(HEADER)
@@ -32,19 +45,28 @@ while True:
 
         # User prompted to vote piece
         if data_in.get("prompt"):
-            x_value = int(input("x value on board: "))
-            y_value = int(input("y value on board: "))
+            x_value = int(input("x: "))
+            y_value = int(input("y: "))
             if x_value == -1 or y_value == -1:
                 break                
+            
+            #while x_value == None and y_value == None:
+            #    pass
+
+            # Sending back selection
             data_out = json.dumps({"x": x_value, "y": y_value})
             client.send(data_out.encode())
             print("Sent\n")
 
         # Board update
         if data_in.get("board"):
-            game_board = data_in.get("board")
+            temp_board = data_in.get("board")
+            for i in range(3):
+                for j in range(3):
+                    board[i][j] = temp_board[i][j]
+
             print(data_in.get("msg"))
-            for row in game_board:
+            for row in board:
                 print(" | ".join(row))
                 print("----")
             print("")
