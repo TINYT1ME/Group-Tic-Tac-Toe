@@ -14,7 +14,6 @@ def get_click():
     # Create the WIN
     WIN = pygame.display.set_mode(WIN_size)
 
-
     while True:
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONUP:
@@ -22,6 +21,7 @@ def get_click():
                 row = y // 100
                 col = x // 100
                 return row, col
+
 
 def draw_window(board, font, small_font, WIN, black, white, team, counter):
     WIN.fill(white)
@@ -38,7 +38,7 @@ def draw_window(board, font, small_font, WIN, black, white, team, counter):
     else:
         text = small_font.render("Team: O", True, black)
     WIN.blit(text, (0, 0))
-    
+
     # Show counter
     counter = small_font.render(str(counter), True, black)
     WIN.blit(counter, (240, 0))
@@ -69,7 +69,6 @@ def main(board, team, countdown):
     black = (0, 0, 0)
     white = (255, 255, 255)
 
-
     # Define the font
     font = pygame.font.Font(None, 72)
     small_font = pygame.font.Font(None, 24)
@@ -78,6 +77,6 @@ def main(board, team, countdown):
     while not game_over:
         draw_window(board, font, small_font, WIN, black, white, team, countdown)
 
+
 # Quit pygame
 pygame.quit()
-
