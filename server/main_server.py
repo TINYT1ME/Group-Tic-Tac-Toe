@@ -5,6 +5,7 @@ import time
 import select
 import threading
 from random import randint
+import time
 
 # Server info
 HEADER = 1024
@@ -29,16 +30,21 @@ all_players = []
 # Dictionary that holds position and # of times that pos was entered
 voting = {}
 
+team_to_symb = {
+    0: "X",
+    1: "O"
+}
+
 # Update board
 def update_board(team):
     global game_board
 
     # If dictionary empty
     if not voting:
-        game_board[randint(0, 2)][randint(0, 2)] = f"{team}"
+        game_board[randint(0, 2)][randint(0, 2)] = team_to_symb[team]
     else:
         points = max(voting, key=voting.get)
-        game_board[points[1]][points[0]] = f"{team}"
+        game_board[points[1]][points[0]] = team_to_symb[team]
 
 def check_valid(x_value, y_value):
     if (
@@ -80,6 +86,12 @@ def handle_connection(conn):
             print(voting)
             print(f"\n[CLIENT DATA] {conn} entered: x={x_value}, y={y_value}\n")
     
+def countdown(num):
+    for i in range(num, 0, -1):
+        print("\r", end = '')
+        print(i, end='')
+        time.sleep(1)
+
 # Server start function
 def start():
     global voting
@@ -94,6 +106,8 @@ def start():
     t_end = time.time() + 10
     print("[CONNECTIONS] Beginning connections (60 sec)")
 
+    timer = threading.Thread(target=countdown, args=(59,))
+    timer.start()
     # Checking for new clients, loop
     while time.time() < t_end:
         team = (team + 1) % 2   # Alternates 0 and 1
@@ -121,7 +135,6 @@ def start():
 
 
         all_threads = []
-        # while time.time() < t_end:
         for player in all_players:
             if player[1] == team:
                 t = threading.Thread(target=handle_connection,
@@ -130,6 +143,8 @@ def start():
                 all_threads.append(t)                    
                 print(all_threads)
 
+
+        # Allow 15 seconds for players to submit vote
         t_end = time.time() + 15
         while time.time() < t_end:
             pass

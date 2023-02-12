@@ -23,7 +23,7 @@ def get_click():
                 col = x // 100
                 return row, col
 
-def draw_window(board, font, small_font, WIN, black, white, team):
+def draw_window(board, font, small_font, WIN, black, white, team, counter):
     WIN.fill(white)
 
     # draw board
@@ -39,6 +39,9 @@ def draw_window(board, font, small_font, WIN, black, white, team):
         text = small_font.render("Team: O", True, black)
     WIN.blit(text, (0, 0))
     
+    # Show counter
+    counter = small_font.render(str(counter), True, black)
+    WIN.blit(counter, (240, 0))
 
     # Draw board lines
     pygame.draw.line(WIN, black, (100, 0), (100, 300), 5)
@@ -50,7 +53,7 @@ def draw_window(board, font, small_font, WIN, black, white, team):
     pygame.display.update()
 
 
-def main(board, team):
+def main(board, team, countdown):
     global x_value
     global y_value
     # Initialize pygame
@@ -66,8 +69,6 @@ def main(board, team):
     black = (0, 0, 0)
     white = (255, 255, 255)
 
-    # Define the game board
-    #board = [[" " for i in range(3)] for j in range(3)]
 
     # Define the font
     font = pygame.font.Font(None, 72)
@@ -75,15 +76,7 @@ def main(board, team):
 
     # Main game loop
     while not game_over:
- #       for event in pygame.event.get():
- #           if event.type == pygame.MOUSEBUTTONUP:
- #               x, y = pygame.mouse.get_pos()
- #               row = y // 100
- #               col = x // 100
- #               x_value = col
- #               y_value = row
- #
-        draw_window(board, font, small_font, WIN, black, white, team)
+        draw_window(board, font, small_font, WIN, black, white, team, countdown)
 
 # Quit pygame
 pygame.quit()

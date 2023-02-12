@@ -1,15 +1,14 @@
-import game
-import threading
+import tkinter as tk
+from tkinter import simpledialog
 
-board = [
-    ["2","5","2"],
-    ["2","5","2"],
-    ["2","5","1"]
-]
+root = tk.Tk()
+root.withdraw()
 
-t = threading.Thread(target=game.main, args=(board,))
-t.start()
+prompt_value = simpledialog.askstring("Input", "Please enter a value:", parent=root)
 
-board[1][1] = "8"
+if prompt_value is not None:
+    print("You entered:", prompt_value)
+else:
+    print("No value entered.")
 
-print(game.get_click())
+root.mainloop()

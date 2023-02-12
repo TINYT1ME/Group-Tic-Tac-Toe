@@ -3,6 +3,12 @@ import json
 import sys
 from game import main
 import threading
+import tkinter as tk
+from tkinter import simpledialog
+import time
+
+root = tk.Tk()
+root.withdraw()
 
 # Connection information
 HEADER = 1024
@@ -33,9 +39,22 @@ data_in = json.loads(data_in.decode())
 team = data_in.get("team")
 print(f"You are on team {team}")
 
+# Countdown
+countdown_counter = 15
+def countdown_pygame():
+    global countdown_counter
+    if countdown_counter <= 0:
+        countdown_counter += 15
+    else:
+        countdown_counter -= 1
+    time.sleep(1)
+
 # Create pygame thread
-game_thread = threading.Thread(target=main, args=(board, team))
+game_thread = threading.Thread(target=main, args=(board, team, countdown_counter))
 game_thread.start()
+
+timer_thread = threading.Thread(target=countdown_pygame)
+timer_thread.start()
 
 
 while True:
@@ -45,14 +64,11 @@ while True:
 
         # User prompted to vote piece
         if data_in.get("prompt"):
-            x_value = int(input("x: "))
-            y_value = int(input("y: "))
+            x_value = int(simpledialog.askstring(data_in.get("msg"), "X Val:", parent=root))
+            y_value = int(simpledialog.askstring(data_in.get("msg"), "Y Val:", parent=root))
             if x_value == -1 or y_value == -1:
                 break                
             
-            #while x_value == None and y_value == None:
-            #    pass
-
             # Sending back selection
             data_out = json.dumps({"x": x_value, "y": y_value})
             client.send(data_out.encode())
